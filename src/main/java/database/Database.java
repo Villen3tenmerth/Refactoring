@@ -19,7 +19,7 @@ public class Database {
 
     public void createProductsTable() throws SQLException {
         try (Connection c = DriverManager.getConnection(getUrl())) {
-            String sql = SQLQuerryBuilder.getCreateTableQuerry("PRODUCT",
+            String sql = SQLQueryBuilder.buildCreateTableQuery("PRODUCT",
                     new SQLAttribute("NAME", "TEXT", false),
                     new SQLAttribute("PRICE", "INT", false));
             Statement stmt = c.createStatement();

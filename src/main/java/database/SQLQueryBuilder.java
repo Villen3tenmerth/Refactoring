@@ -1,7 +1,7 @@
 package database;
 
-public class SQLQuerryBuilder {
-    public static String getCreateTableQuerry(String tableName, SQLAttribute... attributes) {
+public class SQLQueryBuilder {
+    public static String buildCreateTableQuery(String tableName, SQLAttribute... attributes) {
         StringBuilder sb = new StringBuilder();
         sb.append("CREATE TABLE IF NOT EXISTS ").append(tableName);
         sb.append("(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,");
