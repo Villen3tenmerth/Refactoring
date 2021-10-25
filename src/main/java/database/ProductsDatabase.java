@@ -1,16 +1,17 @@
 package database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ProductsDatabase {
     private static final String SCHEMA = "jdbc:sqlite";
     private static final String TABLE_NAME = "PRODUCTS";
-    private static final SQLAttribute[] ATTRIBUTES = new SQLAttribute[]{
-            new SQLAttribute("NAME", SQLAttribute.SQLAttributeType.TEXT, false),
-            new SQLAttribute("PRICE", SQLAttribute.SQLAttributeType.INT, false)};
+    private static final SQLAttribute NAME =
+            new SQLAttribute("NAME", SQLAttribute.SQLAttributeType.TEXT, false);
+    private static final SQLAttribute PRICE =
+            new SQLAttribute("PRICE", SQLAttribute.SQLAttributeType.INT, false);
 
     private final String file;
 
@@ -22,21 +23,49 @@ public class ProductsDatabase {
         return SCHEMA + ":" + file;
     }
 
-    private void executeSQL(String sql) throws SQLException {
+    private interface SQLConsumer<T> {
+        void accept(T t) throws SQLException;
+    }
+
+    private void executeWithConnection(SQLConsumer<Connection> consumer) throws SQLException {
         try (Connection c = DriverManager.getConnection(getUrl())) {
-            Statement stmt = c.createStatement();
-            stmt.executeUpdate(sql);
-            stmt.close();
+            consumer.accept(c);
         }
     }
 
+    private void executeSQLUpdate(String sql) throws SQLException {
+        executeWithConnection(c -> {
+            Statement stmt = c.createStatement();
+            stmt.executeUpdate(sql);
+            stmt.close();
+        });
+    }
+
     public void createTable() throws SQLException {
-        executeSQL(SQLQueryBuilder.buildCreateTableQuery(TABLE_NAME, ATTRIBUTES));
+        executeSQLUpdate(SQLQueryBuilder.buildCreateTableQuery(TABLE_NAME, NAME, PRICE));
     }
 
     public void insertItem(Product product) throws SQLException {
-        SQLAttribute name = new SQLAttribute(ATTRIBUTES[0], product.getName());
-        SQLAttribute price = new SQLAttribute(ATTRIBUTES[1], Long.toString(product.getPrice()));
-        executeSQL(SQLQueryBuilder.buildInsertQuery(TABLE_NAME, name, price));
+        SQLAttribute name = new SQLAttribute(NAME, product.getName());
+        SQLAttribute price = new SQLAttribute(PRICE, Long.toString(product.getPrice()));
+        executeSQLUpdate(SQLQueryBuilder.buildInsertQuery(TABLE_NAME, name, price));
+    }
+
+    public List<Product> getAllItems() throws SQLException {
+        List<Product> items = new ArrayList<>();
+        executeWithConnection(c -> {
+            Statement stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery(SQLQueryBuilder.buildSelectAllQuery(TABLE_NAME));
+
+            while (rs.next()) {
+                String name = rs.getString(NAME.getName());
+                int price = rs.getInt(PRICE.getName());
+                items.add(new Product(name, price));
+            }
+
+            rs.close();
+            stmt.close();
+        });
+        return items;
     }
 }

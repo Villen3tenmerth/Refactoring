@@ -30,4 +30,8 @@ public class SQLQueryBuilder {
         sb.append(")");
         return sb.toString();
     }
+
+    public static String buildSelectAllQuery(String tableName) {
+        return "SELECT * FROM " + tableName;
+    }
 }

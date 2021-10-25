@@ -6,6 +6,7 @@ import database.ProductsDatabase;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class AddProductServlet extends AbstractProductsServlet {
 
@@ -20,7 +21,7 @@ public class AddProductServlet extends AbstractProductsServlet {
 
         try {
             db.insertItem(new Product(name, price));
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 

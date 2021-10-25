@@ -27,11 +27,18 @@ class SQLQueryBuilderTest {
         final String nameValue = "iphone";
         final String priceValue = "300";
 
-        String sql = SQLQueryBuilder.buildInsertQuery("PRODUCT",
+        String sql = SQLQueryBuilder.buildInsertQuery(TABLE_NAME,
                 new SQLAttribute(NAME, nameValue),
                 new SQLAttribute(PRICE, priceValue));
         String correctQuery = "INSERT INTO PRODUCT " +
                 "(NAME, PRICE) VALUES (\"" + nameValue + "\", " + priceValue + ")";
+        assertEquals(correctQuery, sql);
+    }
+
+    @Test
+    void buildSelectAllQueryTest() {
+        String sql = SQLQueryBuilder.buildSelectAllQuery(TABLE_NAME);
+        String correctQuery = "SELECT * FROM PRODUCT";
         assertEquals(correctQuery, sql);
     }
 }
