@@ -114,4 +114,8 @@ public class ProductsDatabase {
         return executeSQLQuery(SQLQueryBuilder.buildSelectCountQuery(TABLE_NAME),
                 rs -> rs.getInt(1));
     }
+
+    public void clearTable() throws SQLException {
+        executeSQLUpdate(SQLQueryBuilder.buildDeleteQuery(TABLE_NAME));
+    }
 }

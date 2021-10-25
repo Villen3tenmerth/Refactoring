@@ -18,9 +18,9 @@ import java.net.http.HttpResponse;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AddProductServletTest {
-    protected static final HttpClient CLIENT = HttpClient.newHttpClient();
-    protected static final int PORT = 8082;
-    protected static final Server SERVER = new Server(PORT);
+    private static final HttpClient CLIENT = HttpClient.newHttpClient();
+    private static final int PORT = 8082;
+    private static final Server SERVER = new Server(PORT);
 
     private static final String SERVLET_PATH = "/add-product";
     private static final String CORRECT_RESPONSE = "<html><body>\nOK\n</body></html>\n";

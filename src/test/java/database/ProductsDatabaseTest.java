@@ -55,4 +55,15 @@ class ProductsDatabaseTest {
         List<Product> items = db.getAllItems();
         assertTrue(PRODUCTS.containsAll(items));
     }
+
+    @Test
+    void clearTest() throws SQLException {
+        fillTable();
+        db.clearTable();
+        assertEquals(0, db.getCount());
+        assertEquals(0, db.getSumPrice());
+        assertNull(db.getMaxPriceItem());
+        assertNull(db.getMinPriceItem());
+        assertTrue(db.getAllItems().isEmpty());
+    }
 }

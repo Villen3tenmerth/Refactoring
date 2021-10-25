@@ -56,4 +56,8 @@ public class SQLQueryBuilder {
     public static String buildSelectCountQuery(String tableName) {
         return "SELECT COUNT(*) FROM " + tableName;
     }
+
+    public static String buildDeleteQuery(String tableName) {
+        return "DELETE FROM " + tableName;
+    }
 }
