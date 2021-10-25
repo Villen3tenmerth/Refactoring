@@ -41,4 +41,25 @@ class SQLQueryBuilderTest {
         String correctQuery = "SELECT * FROM PRODUCT";
         assertEquals(correctQuery, sql);
     }
+
+    @Test
+    void buildSelectAllOrderedQueryTest() {
+        String sql = SQLQueryBuilder.buildSelectAllOrderedQuery(TABLE_NAME, "PRICE", true, 1);
+        String correctQuery = "SELECT * FROM PRODUCT ORDER BY (PRICE) DESC LIMIT 1";
+        assertEquals(correctQuery, sql);
+    }
+
+    @Test
+    void buildSelectSumQueryTest() {
+        String sql = SQLQueryBuilder.buildSelectSumQuery(TABLE_NAME, "PRICE");
+        String correctQuery = "SELECT SUM(PRICE) FROM PRODUCT";
+        assertEquals(correctQuery, sql);
+    }
+
+    @Test
+    void buildSelectCountQueryTest() {
+        String sql = SQLQueryBuilder.buildSelectCountQuery(TABLE_NAME);
+        String correctQuery = "SELECT COUNT(*) FROM PRODUCT";
+        assertEquals(correctQuery, sql);
+    }
 }

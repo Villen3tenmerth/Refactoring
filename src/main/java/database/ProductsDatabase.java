@@ -3,7 +3,7 @@ package database;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ProductsDatabase {
     private static final String SCHEMA = "jdbc:sqlite";
@@ -41,6 +41,34 @@ public class ProductsDatabase {
         });
     }
 
+    private interface SQLFunction<S, T> {
+        T apply(S s) throws SQLException;
+    }
+
+    private <R> R executeSQLQuery(String sql, SQLFunction<ResultSet, R> function) throws SQLException {
+        AtomicReference<R> res = new AtomicReference<>();
+        executeWithConnection(c -> {
+            Statement stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            res.set(function.apply(rs));
+
+            rs.close();
+            stmt.close();
+        });
+        return res.get();
+    }
+
+    private List<Product> selectAll(ResultSet rs) throws SQLException {
+        List<Product> items = new ArrayList<>();
+        while (rs.next()) {
+            String name = rs.getString(NAME.getName());
+            int price = rs.getInt(PRICE.getName());
+            items.add(new Product(name, price));
+        }
+        return items;
+    }
+
     public void createTable() throws SQLException {
         executeSQLUpdate(SQLQueryBuilder.buildCreateTableQuery(TABLE_NAME, NAME, PRICE));
     }
@@ -52,20 +80,38 @@ public class ProductsDatabase {
     }
 
     public List<Product> getAllItems() throws SQLException {
-        List<Product> items = new ArrayList<>();
-        executeWithConnection(c -> {
-            Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery(SQLQueryBuilder.buildSelectAllQuery(TABLE_NAME));
+        return executeSQLQuery(SQLQueryBuilder.buildSelectAllQuery(TABLE_NAME), this::selectAll);
+    }
 
-            while (rs.next()) {
-                String name = rs.getString(NAME.getName());
-                int price = rs.getInt(PRICE.getName());
-                items.add(new Product(name, price));
-            }
+    public Product getMaxPriceItem() throws SQLException {
+        List<Product> items = executeSQLQuery(
+                SQLQueryBuilder.buildSelectAllOrderedQuery(TABLE_NAME, "PRICE", false, 1),
+                this::selectAll);
+        if (items.isEmpty()) {
+            return null;
+        } else {
+            return items.get(0);
+        }
+    }
 
-            rs.close();
-            stmt.close();
-        });
-        return items;
+    public Product getMinPriceItem() throws SQLException {
+        List<Product> items = executeSQLQuery(
+                SQLQueryBuilder.buildSelectAllOrderedQuery(TABLE_NAME, "PRICE", true, 1),
+                this::selectAll);
+        if (items.isEmpty()) {
+            return null;
+        } else {
+            return items.get(0);
+        }
+    }
+
+    public long getSumPrice() throws SQLException {
+        return executeSQLQuery(SQLQueryBuilder.buildSelectSumQuery(TABLE_NAME, "PRICE"),
+                rs -> rs.getLong(1));
+    }
+
+    public int getCount() throws SQLException {
+        return executeSQLQuery(SQLQueryBuilder.buildSelectCountQuery(TABLE_NAME),
+                rs -> rs.getInt(1));
     }
 }

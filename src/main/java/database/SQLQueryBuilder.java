@@ -34,4 +34,26 @@ public class SQLQueryBuilder {
     public static String buildSelectAllQuery(String tableName) {
         return "SELECT * FROM " + tableName;
     }
+
+    public static String buildSelectAllOrderedQuery(String tableName,
+                                                    String attribute,
+                                                    boolean isDesc,
+                                                    int limit) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT * FROM ").append(tableName);
+        sb.append(" ORDER BY (").append(attribute).append(") ");
+        if (isDesc) {
+            sb.append("DESC ");
+        }
+        sb.append("LIMIT ").append(limit);
+        return sb.toString();
+    }
+
+    public static String buildSelectSumQuery(String tableName, String attribute) {
+        return "SELECT SUM(" + attribute + ") FROM " + tableName;
+    }
+
+    public static String buildSelectCountQuery(String tableName) {
+        return "SELECT COUNT(*) FROM " + tableName;
+    }
 }
