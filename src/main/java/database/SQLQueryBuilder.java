@@ -21,7 +21,7 @@ public class SQLQueryBuilder {
         sb.append(Arrays.stream(attributes).map(SQLAttribute::getName).collect(Collectors.joining(", ")));
         sb.append(") VALUES (");
         sb.append(Arrays.stream(attributes).map(attr -> {
-            if (attr.getType().isText()) {
+            if (attr.getType().isText() && attr.getValue() != null) {
                 return "\"" + attr.getValue() + "\"";
             } else {
                 return attr.getValue();
