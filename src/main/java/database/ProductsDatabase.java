@@ -85,7 +85,7 @@ public class ProductsDatabase {
 
     public Product getMaxPriceItem() throws SQLException {
         List<Product> items = executeSQLQuery(
-                SQLQueryBuilder.buildSelectAllOrderedQuery(TABLE_NAME, "PRICE", false, 1),
+                SQLQueryBuilder.buildSelectAllOrderedQuery(TABLE_NAME, "PRICE", true, 1),
                 this::selectAll);
         if (items.isEmpty()) {
             return null;
@@ -96,7 +96,7 @@ public class ProductsDatabase {
 
     public Product getMinPriceItem() throws SQLException {
         List<Product> items = executeSQLQuery(
-                SQLQueryBuilder.buildSelectAllOrderedQuery(TABLE_NAME, "PRICE", true, 1),
+                SQLQueryBuilder.buildSelectAllOrderedQuery(TABLE_NAME, "PRICE", false, 1),
                 this::selectAll);
         if (items.isEmpty()) {
             return null;

@@ -22,9 +22,13 @@ public class QueryServlet extends AbstractProductsServlet {
         if ("max".equals(command)) {
             try {
                 response.getWriter().println("<html><body>");
-                response.getWriter().println("<h1>Product with max price: </h1>");
                 Product p = db.getMaxPriceItem();
-                response.getWriter().println(p.getName() + "\t" + p.getPrice() + "</br>");
+                if (p == null) {
+                    response.getWriter().println("<h1>There is no products</h1>");
+                } else {
+                    response.getWriter().println("<h1>Product with max price: </h1>");
+                    response.getWriter().println(p.getName() + "\t" + p.getPrice() + "</br>");
+                }
                 response.getWriter().println("</body></html>");
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -32,9 +36,13 @@ public class QueryServlet extends AbstractProductsServlet {
         } else if ("min".equals(command)) {
             try {
                 response.getWriter().println("<html><body>");
-                response.getWriter().println("<h1>Product with min price: </h1>");
                 Product p = db.getMinPriceItem();
-                response.getWriter().println(p.getName() + "\t" + p.getPrice() + "</br>");
+                if (p == null) {
+                    response.getWriter().println("<h1>There is no products</h1>");
+                } else {
+                    response.getWriter().println("<h1>Product with min price: </h1>");
+                    response.getWriter().println(p.getName() + "\t" + p.getPrice() + "</br>");
+                }
                 response.getWriter().println("</body></html>");
             } catch (Exception e) {
                 throw new RuntimeException(e);
