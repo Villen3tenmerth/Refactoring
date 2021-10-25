@@ -14,10 +14,6 @@ public class HTMLResponseBuilder {
         lines = new ArrayList<>();
     }
 
-    private void print(String s) throws IOException {
-        response.getWriter().println(s);
-    }
-
     public void addLine(String line) {
         lines.add(line + "<br>");
     }
@@ -26,16 +22,22 @@ public class HTMLResponseBuilder {
         if (level == 0) {
             lines.add(header);
         } else {
-            lines.add("<h" + level + ">" + header + "<h" + level + "/>");
+            lines.add("<h" + level + ">" + header + "</h" + level + ">");
         }
     }
 
-    public void finish() throws IOException {
-        print("<html><body>");
+    public String getResponseBody() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><body>\n");
         for (String line : lines) {
-            print(line);
+            sb.append(line).append('\n');
         }
-        print("</body></html>");
+        sb.append("</body></html>\n");
+        return sb.toString();
+    }
+
+    public void finish() throws IOException {
+        response.getWriter().print(getResponseBody());
         response.setContentType("test/html");
         response.setStatus(HttpServletResponse.SC_OK);
     }
