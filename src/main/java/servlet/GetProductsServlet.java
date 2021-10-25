@@ -2,6 +2,7 @@ package servlet;
 
 import database.Product;
 import database.ProductsDatabase;
+import html.HTMLResponseBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,18 +18,17 @@ public class GetProductsServlet extends AbstractProductsServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HTMLResponseBuilder builder = new HTMLResponseBuilder(response);
+
         try {
             List<Product> products = db.getAllItems();
-            response.getWriter().println("<html><body>");
             for (Product p : products) {
-                response.getWriter().println(p.getName() + "\t" + p.getPrice() + "</br>");
+                builder.addLine(p.toString());
             }
-            response.getWriter().println("</body></html>");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
+        builder.finish();
     }
 }

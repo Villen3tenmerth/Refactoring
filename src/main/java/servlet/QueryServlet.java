@@ -2,8 +2,8 @@ package servlet;
 
 import database.Product;
 import database.ProductsDatabase;
+import html.HTMLResponseBuilder;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -18,61 +18,39 @@ public class QueryServlet extends AbstractProductsServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String command = request.getParameter("command");
+        HTMLResponseBuilder builder = new HTMLResponseBuilder(response);
 
-        if ("max".equals(command)) {
-            try {
-                response.getWriter().println("<html><body>");
+        try {
+            if ("max".equals(command)) {
                 Product p = db.getMaxPriceItem();
                 if (p == null) {
-                    response.getWriter().println("<h1>There is no products</h1>");
+                    builder.addHeader("There is no products", 1);
                 } else {
-                    response.getWriter().println("<h1>Product with max price: </h1>");
-                    response.getWriter().println(p.getName() + "\t" + p.getPrice() + "</br>");
+                    builder.addHeader("Product with max price: ", 1);
+                    builder.addLine(p.toString());
                 }
-                response.getWriter().println("</body></html>");
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        } else if ("min".equals(command)) {
-            try {
-                response.getWriter().println("<html><body>");
+            } else if ("min".equals(command)) {
                 Product p = db.getMinPriceItem();
                 if (p == null) {
-                    response.getWriter().println("<h1>There is no products</h1>");
+                    builder.addHeader("There is no products", 1);
                 } else {
-                    response.getWriter().println("<h1>Product with min price: </h1>");
-                    response.getWriter().println(p.getName() + "\t" + p.getPrice() + "</br>");
+                    builder.addHeader("Product with min price: ", 1);
+                    builder.addLine(p.toString());
                 }
-                response.getWriter().println("</body></html>");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else if ("sum".equals(command)) {
-            try {
-                response.getWriter().println("<html><body>");
-                response.getWriter().println("Summary price: ");
+            } else if ("sum".equals(command)) {
                 long sum = db.getSumPrice();
-                response.getWriter().println(sum);
-                response.getWriter().println("</body></html>");
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        } else if ("count".equals(command)) {
-            try {
-                response.getWriter().println("<html><body>");
-                response.getWriter().println("Number of products: ");
+                builder.addHeader("Summary price: " + sum, 0);
+            } else if ("count".equals(command)) {
                 int cnt = db.getCount();
-                response.getWriter().println(cnt);
-                response.getWriter().println("</body></html>");
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+                builder.addHeader("Number of products: " + cnt, 0);
+            } else {
+                builder.addHeader("Unknown command: " + command, 0);
             }
-        } else {
-            response.getWriter().println("Unknown command: " + command);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
+        builder.finish();
     }
 
 }

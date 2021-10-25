@@ -2,6 +2,7 @@ package servlet;
 
 import database.Product;
 import database.ProductsDatabase;
+import html.HTMLResponseBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,8 @@ public class AddProductServlet extends AbstractProductsServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HTMLResponseBuilder builder = new HTMLResponseBuilder(response);
+
         String name = request.getParameter("name");
         long price = Long.parseLong(request.getParameter("price"));
 
@@ -25,8 +28,7 @@ public class AddProductServlet extends AbstractProductsServlet {
             throw new RuntimeException(e);
         }
 
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().println("OK");
+        builder.addHeader("OK", 0);
+        builder.finish();
     }
 }
